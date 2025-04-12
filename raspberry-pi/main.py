@@ -44,6 +44,7 @@ def loop(cam, arduino):
 
     while True:
         ret, frame = cam.read()
+        cv2.normalize(frame, frame, 0, 255, cv2.NORM_MINMAX)
 
         hsvImage = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         lowerLimit, upperLimit = get_limits(orange)
