@@ -10,14 +10,14 @@ const int PIN_MP3_TX = 21; // Connects to module's TX
 
 class Speaker {
 public:
-  enum Sound {
+  enum Voiceline {
     STARTUP = 1,
     HELLO1,
     OKAY
   };
   Speaker();
   void setup();                // Initializes the speaker
-  void playTrack(Sound sound);   // Plays a specific track
+  void playTrack(Voiceline sound);   // Plays a specific track
 
 private:
     HardwareSerial dfplayerSerial;  // Hardware serial for DFPlayer Mini

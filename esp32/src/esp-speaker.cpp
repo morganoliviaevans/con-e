@@ -21,7 +21,7 @@ void Speaker::setup()
   Serial.println(player.readCurrentFileNumber());
 }
 
-void Speaker::playTrack(Sound sound) 
-  {
+void Speaker::playTrack(Voiceline sound) 
+{
   player.play(sound);
-  }
+}
