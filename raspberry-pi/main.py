@@ -1,3 +1,4 @@
+from PIL import Image
 from enum import Enum
 import numpy as np
 import cv2
@@ -51,30 +52,43 @@ def loop(cam, arduino):
 
         mask = cv2.inRange(hsvImage, lowerLimit, upperLimit)
 
-        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        mask_ = Image.fromarray(mask)
 
-        if contours:
-            largest_contour = max(contours, key=cv2.contourArea)
+        bbox = mask_.getbbox()
 
-            # draw box around the largest contour
-            x1, y1, x2, y2 = cv2.boundingRect(largest_contour)
-            cv2.rectangle(frame, (x1, y2), (x1 + x2, y1 + y2), (0, 255, 0), 2)
+        print(bbox)
 
-            direction = get_direction(x1, y1, x2, y2)
+        if bbox is not None:
+            x1, y1, x2, y2 = bbox
 
-            # do something based off the direction
-            match direction:
-                case Direction.CENTER:
-                    arduino.write(b"s")
-                    print("center")
-                case Direction.LEFT:
-                    arduino.write(b"l")
-                    print("left")
-                case Direction.RIGHT:
-                    arduino.write(b"r")
-                    print("right")
+            frame = cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
 
-        cv2.imshow("frame", frame)
+        cv2.imshow("frame", mask)
+
+        # contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        #
+        # if contours:
+        #     largest_contour = max(contours, key=cv2.contourArea)
+
+        # draw box around the largest contour
+        # x1, y1, x2, y2 = cv2.boundingRect(largest_contour)
+        # cv2.rectangle(frame, (x1, y2), (x1 + x2, y1 + y2), (0, 255, 0), 2)
+
+        #     direction = get_direction(x1, y1, x2, y2)
+        #
+        #     # do something based off the direction
+        #     match direction:
+        #         case Direction.CENTER:
+        #             arduino.write(b"s")
+        #             print("center")
+        #         case Direction.LEFT:
+        #             arduino.write(b"l")
+        #             print("left")
+        #         case Direction.RIGHT:
+        #             arduino.write(b"r")
+        #             print("right")
+        #
+        # cv2.imshow("frame", frame)
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
