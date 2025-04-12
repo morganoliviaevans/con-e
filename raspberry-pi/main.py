@@ -20,7 +20,7 @@ def get_limits(color):
     hsvC = cv2.cvtColor(c, cv2.COLOR_BGR2HSV)
 
     # calculate tolerances for the orange
-    lowerLimit = hsvC[0][0][0] - 10, 100, 100
+    lowerLimit = hsvC[0][0][0] - 10, 120, 200
     upperLimit = hsvC[0][0][0] + 10, 255, 255
 
     lowerLimit = np.array(lowerLimit, dtype=np.uint8)
@@ -29,12 +29,12 @@ def get_limits(color):
     return lowerLimit, upperLimit
 
 
-def get_direction(x1, y1, x2, y2):
-    midpoint = (x1 + (x1 + x2)) / 2
+def get_direction(y1, y2):
+    midpoint = (y1 + (y1 + y2)) / 2
 
-    if midpoint < 200:
+    if midpoint < 100:
         return Direction.RIGHT
-    elif midpoint >= 400:
+    elif midpoint >= 500:
         return Direction.LEFT
     else:
         return Direction.CENTER
@@ -56,39 +56,26 @@ def loop(cam, arduino):
 
         bbox = mask_.getbbox()
 
-        print(bbox)
-
         if bbox is not None:
             x1, y1, x2, y2 = bbox
 
             frame = cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
+            direction = get_direction(y1, y2)
+
+            # do something based off the direction
+            match direction:
+                case Direction.CENTER:
+                    arduino.write(b"s")
+                    print("center")
+                case Direction.LEFT:
+                    arduino.write(b"l")
+                    print("left")
+                case Direction.RIGHT:
+                    arduino.write(b"r")
+                    print("right")
 
         cv2.imshow("frame", mask)
-
-        # contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        #
-        # if contours:
-        #     largest_contour = max(contours, key=cv2.contourArea)
-
-        # draw box around the largest contour
-        # x1, y1, x2, y2 = cv2.boundingRect(largest_contour)
-        # cv2.rectangle(frame, (x1, y2), (x1 + x2, y1 + y2), (0, 255, 0), 2)
-
-        #     direction = get_direction(x1, y1, x2, y2)
-        #
-        #     # do something based off the direction
-        #     match direction:
-        #         case Direction.CENTER:
-        #             arduino.write(b"s")
-        #             print("center")
-        #         case Direction.LEFT:
-        #             arduino.write(b"l")
-        #             print("left")
-        #         case Direction.RIGHT:
-        #             arduino.write(b"r")
-        #             print("right")
-        #
-        # cv2.imshow("frame", frame)
+        cv2.imshow("original", frame)
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
