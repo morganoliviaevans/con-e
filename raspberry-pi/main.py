@@ -1,6 +1,8 @@
 from enum import Enum
 import numpy as np
 import cv2
+import serial
+import time
 
 
 class Direction(Enum):
@@ -34,7 +36,7 @@ def get_direction(x1, y1, x2, y2):
         return Direction.CENTER
 
 
-def loop(cam):
+def loop(cam, arduino):
     orange = [12, 95, 247]
 
     while True:
@@ -59,10 +61,13 @@ def loop(cam):
             # do something based off the direction
             match direction:
                 case Direction.CENTER:
+                    arduino.write(b"s")
                     print("center")
                 case Direction.LEFT:
+                    arduino.write(b"f")
                     print("left")
                 case Direction.RIGHT:
+                    arduino.write(b"b")
                     print("right")
 
         cv2.imshow("frame", frame)
@@ -76,9 +81,11 @@ def loop(cam):
 
 if __name__ == "__main__":
     cam = cv2.VideoCapture(0)
+    arduino = serial.Serial("/dev/ttyUSB0", 9600)
+    time.sleep(2)
 
     try:
-        loop(cam)
+        loop(cam, arduino)
     except KeyboardInterrupt:
         cam.release()
-        cv2.destroyAllWindows
+        cv2.destroyAllWindows()
