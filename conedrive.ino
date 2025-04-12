@@ -104,7 +104,7 @@ digitalWrite(IN2,LOW);
 analogWrite(ENA, 180); // 0-255 (PWM)
 digitalWrite(IN3,HIGH);
 digitalWrite(IN4,LOW);
-analogWrite(ENB, 180; // 0-255 (PWM)
+analogWrite(ENB, 180); // 0-255 (PWM)
 }
 
 void stopMotor() {
@@ -119,5 +119,7 @@ void stopMotor() {
 
 void spin() {
 
-
+ rotateRight();
+ delay(5000);
+ stopMotor();
 }
