@@ -5,8 +5,8 @@
 #include "DFRobotDFPlayerMini.h"
 
 // Use pins 20 and 21 with HardwareSerial to communicate with DFPlayer Mini
-const int PIN_MP3_RX = 20; // Connects to module's RX
-const int PIN_MP3_TX = 21; // Connects to module's TX
+const int PIN_MP3_RX = 20; // Connects to module's RX -- GPIO 44
+const int PIN_MP3_TX = 21; // Connects to module's TX -- GPIO 43
 
 class Speaker {
 public:
