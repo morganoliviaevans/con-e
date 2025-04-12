@@ -32,9 +32,9 @@ def get_direction(x1, y1, x2, y2):
     midpoint = (x1 + (x1 + x2)) / 2
 
     if midpoint < 200:
-        return Direction.LEFT
-    elif midpoint >= 400:
         return Direction.RIGHT
+    elif midpoint >= 400:
+        return Direction.LEFT
     else:
         return Direction.CENTER
 
