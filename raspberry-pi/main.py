@@ -1,8 +1,12 @@
+from enum import Enum
 import numpy as np
 import cv2
 
-cam = cv2.VideoCapture(0)
-orange = [12, 95, 247]
+
+class Direction(Enum):
+    CENTER = 0
+    LEFT = 1
+    RIGHT = 2
 
 
 def get_limits(color):
@@ -19,37 +23,62 @@ def get_limits(color):
     return lowerLimit, upperLimit
 
 
-while True:
-    ret, frame = cam.read()
+def get_direction(x1, y1, x2, y2):
+    midpoint = (x1 + (x1 + x2)) / 2
 
-    hsvImage = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    lowerLimit, upperLimit = get_limits(orange)
+    if midpoint < 200:
+        return Direction.LEFT
+    elif midpoint >= 400:
+        return Direction.RIGHT
+    else:
+        return Direction.CENTER
 
-    mask = cv2.inRange(hsvImage, lowerLimit, upperLimit)
 
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+def loop(cam):
+    orange = [12, 95, 247]
 
-    if contours:
-        largest_contour = max(contours, key=cv2.contourArea)
+    while True:
+        ret, frame = cam.read()
 
-        # draw box around the largest contour
-        x1, y1, x2, y2 = cv2.boundingRect(largest_contour)
-        cv2.rectangle(frame, (x1, y2), (x1 + x2, y1 + y2), (0, 255, 0), 2)
+        hsvImage = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        lowerLimit, upperLimit = get_limits(orange)
 
-        # calculate the midpoint of the box
-        midpoint = (x1 + (x1 + x2)) / 2
+        mask = cv2.inRange(hsvImage, lowerLimit, upperLimit)
 
-        if midpoint < 200:
-            print("left")
-        elif midpoint >= 400:
-            print("right")
-        else:
-            print("center")
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    cv2.imshow("frame", frame)
+        if contours:
+            largest_contour = max(contours, key=cv2.contourArea)
 
-    if cv2.waitKey(1) & 0xFF == ord("q"):
-        break
+            # draw box around the largest contour
+            x1, y1, x2, y2 = cv2.boundingRect(largest_contour)
+            cv2.rectangle(frame, (x1, y2), (x1 + x2, y1 + y2), (0, 255, 0), 2)
 
-cam.release()
-cv2.destroyAllWindows()
+            direction = get_direction(x1, y1, x2, y2)
+
+            # do something based off the direction
+            match direction:
+                case Direction.CENTER:
+                    print("center")
+                case Direction.LEFT:
+                    print("left")
+                case Direction.RIGHT:
+                    print("right")
+
+        cv2.imshow("frame", frame)
+
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
+
+    cam.release()
+    cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    cam = cv2.VideoCapture(0)
+
+    try:
+        loop(cam)
+    except KeyboardInterrupt:
+        cam.release()
+        cv2.destroyAllWindows
