@@ -9,6 +9,9 @@ class Direction(Enum):
     CENTER = 0
     LEFT = 1
     RIGHT = 2
+    ROTATE_LEFT = 3
+    ROTATE_RIGHT = 4
+    SPIN = 5
 
 
 def get_limits(color):
@@ -64,10 +67,10 @@ def loop(cam, arduino):
                     arduino.write(b"s")
                     print("center")
                 case Direction.LEFT:
-                    arduino.write(b"f")
+                    arduino.write(b"l")
                     print("left")
                 case Direction.RIGHT:
-                    arduino.write(b"b")
+                    arduino.write(b"r")
                     print("right")
 
         cv2.imshow("frame", frame)
