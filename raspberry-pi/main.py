@@ -13,6 +13,7 @@ class Direction(Enum):
     ROTATE_LEFT = 3
     ROTATE_RIGHT = 4
     SPIN = 5
+    FORWARD = 6
 
 
 def get_limits(color):
@@ -40,6 +41,10 @@ def get_direction(y1, y2):
         return Direction.CENTER
 
 
+def area(x1, x2, y1, y2):
+    return (x2 - x1) * (y2 - y1)
+
+
 def loop(cam, arduino):
     orange = [12, 95, 247]
 
@@ -61,6 +66,8 @@ def loop(cam, arduino):
 
             frame = cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
             direction = get_direction(y1, y2)
+
+            print(area(x1, x2, y1, y2))
 
             # do something based off the direction
             match direction:
