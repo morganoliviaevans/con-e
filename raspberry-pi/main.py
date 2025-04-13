@@ -158,6 +158,7 @@ def loop(cam, arduino):
                 arduino.write(b"s")
                 print("in idle state")
             case DeviceState.SLEEP:
+                arduino.write(b"z")
                 print("sleeping")
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
