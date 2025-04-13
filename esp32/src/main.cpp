@@ -7,7 +7,9 @@ Led led;          // RGB Led obj
 void setup() {
   Serial.begin(115200);
   // speaker.setup();
+  // delay(4000);  // Optional delay before playback starts
   led.setup();
+  led.setMode(Led::IDLE);
 }
 
 void loop() {
@@ -15,5 +17,5 @@ void loop() {
   // delay(4000);
   // speaker.playTrack(Speaker::OKAY);
   // delay(4000);
-  led.flash(Led::IDLE);
+  led.flash();
 }

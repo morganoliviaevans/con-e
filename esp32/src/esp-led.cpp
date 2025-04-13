@@ -13,17 +13,12 @@ void Led::setup()
 
 }
 
-// -- non-blocking time var -- //
-unsigned long prevMillis = 0;
-unsigned long currMillis = 0;
-
-void Led::flash(LightMode action)
+// this runs forever in loop()
+void Led::flash()
 {
     currMillis = millis();
-    if(currMillis - prevMillis < 300)
-        return;
 
-    switch (action) {
+    switch (currMode) {
         case IDLE:
             pulse_yellow();
             break;
@@ -33,15 +28,21 @@ void Led::flash(LightMode action)
     }
 } 
 
-// -- Analog Brightness: 0 -> 255 -- //
-const int maxBright = 255;
-int brightness = 1;
-int redBrightness = 0;
-int greenBrightness = 0;
-int blueBrightness = 0;
-int fadeAmt = 1;
-unsigned long lastUpdate = 0;
-const int pulseDelay = 10;
+void Led::setMode(LightMode newMode)
+{
+    if (newMode != currMode) {
+        currMode = newMode;
+        lastModeSwitch = millis();
+
+        // Reset mode-specific state
+        brightness = 1;
+        redBrightness = 0;
+        greenBrightness = 0;
+        blueBrightness = 0;
+        fadeAmt = 1;
+        lastUpdate = 0;
+    }
+}
 
 void Led::pulse_yellow() 
 {
@@ -60,5 +61,24 @@ void Led::pulse_yellow()
         brightness += fadeAmt;
         redBrightness = brightness;
         greenBrightness = static_cast<int>(brightness * .85);
+    }
+}
+
+void Led::police() 
+{
+    currMillis = millis();
+    if(currMillis - lastFlash >= flashInterval) {
+        lastFlash = currMillis;
+        digitalWrite(PIN_RGB_G, LOW);
+
+        if(redOn) {
+            digitalWrite(PIN_RGB_R, HIGH);
+            digitalWrite(PIN_RGB_B, LOW);
+        } else {
+            digitalWrite(PIN_RGB_R, LOW);
+            digitalWrite(PIN_RGB_B, HIGH);
+        }
+
+        redOn = !redOn;
     }
 }
