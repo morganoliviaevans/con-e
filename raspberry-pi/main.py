@@ -48,9 +48,9 @@ def get_direction(y1, y2):
     midpoint = (y1 + (y1 + y2)) / 2
 
     if midpoint < 100:
-        return Direction.ROTATE_RIGHT
-    elif midpoint >= 500:
         return Direction.ROTATE_LEFT
+    elif midpoint >= 500:
+        return Direction.ROTATE_RIGHT
     else:
         return Direction.STOP
 
