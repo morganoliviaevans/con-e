@@ -7,14 +7,12 @@ import time
 
 
 class Direction(Enum):
-    CENTER = 0
-    LEFT = 1
-    RIGHT = 2
-    ROTATE_LEFT = 3
-    ROTATE_RIGHT = 4
-    SPIN = 5
-    FORWARD = 6
-    BACKWARD = 7
+    STOP = 0
+    ROTATE_LEFT = 1
+    ROTATE_RIGHT = 2
+    SPIN = 3
+    FORWARD = 4
+    BACKWARD = 5
 
 
 def get_limits(color):
@@ -39,7 +37,7 @@ def get_direction(y1, y2):
     elif midpoint >= 500:
         return Direction.LEFT
     else:
-        return Direction.CENTER
+        return Direction.STOP
 
 
 def area(x1, x2, y1, y2):
@@ -88,13 +86,13 @@ def loop(cam, arduino):
                 case Direction.BACKWARD:
                     arduino.write(b"b")
                     print("backward")
-                case Direction.CENTER:
+                case Direction.STOP:
                     arduino.write(b"s")
-                    print("center")
-                case Direction.LEFT:
+                    print("stop")
+                case Direction.ROTATE_LEFT:
                     arduino.write(b"l")
                     print("left")
-                case Direction.RIGHT:
+                case Direction.ROTATE_RIGHT:
                     arduino.write(b"r")
                     print("right")
 
