@@ -14,6 +14,7 @@ class Direction(Enum):
     ROTATE_RIGHT = 4
     SPIN = 5
     FORWARD = 6
+    BACKWARD = 7
 
 
 def get_limits(color):
@@ -46,6 +47,9 @@ def area(x1, x2, y1, y2):
 
 
 def loop(cam, arduino):
+    # TODO: fine tune the area threshold
+    AREA_LOWER_THRESHOLD = 70000
+    AREA_UPPER_THRESHOLD = 130000
     orange = [12, 95, 247]
 
     while True:
@@ -64,13 +68,26 @@ def loop(cam, arduino):
         if bbox is not None:
             x1, y1, x2, y2 = bbox
 
-            frame = cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
-            direction = get_direction(y1, y2)
+            bbox_area = area(x1, x2, y1, y2)
+            print(bbox_area)
 
-            print(area(x1, x2, y1, y2))
+            if bbox_area < AREA_LOWER_THRESHOLD:
+                direction = Direction.FORWARD
+            elif bbox_area > AREA_UPPER_THRESHOLD:
+                direction = Direction.BACKWARD
+            else:
+                direction = get_direction(y1, y2)
+
+            frame = cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
 
             # do something based off the direction
             match direction:
+                case Direction.FORWARD:
+                    arduino.write(b"f")
+                    print("forward")
+                case Direction.BACKWARD:
+                    arduino.write(b"b")
+                    print("backward")
                 case Direction.CENTER:
                     arduino.write(b"s")
                     print("center")
