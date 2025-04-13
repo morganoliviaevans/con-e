@@ -8,7 +8,7 @@ Speaker speaker;
 unsigned long lastSoundTime = 0;
 unsigned long nextSoundInterval = 0;
 
-
+const int STARTUP = 5;
 // Define motor control pins
 const int IN1 = 16;
 const int IN2 = 17;
@@ -31,17 +31,19 @@ void setup() {
   // Set pins as output
   Serial.begin(9600);
 
-  speaker.setup();
+
   led.setup();
 
   // seeding randomizer
   randomSeed(analogRead(A0));
   lastSoundTime = millis();
-  nextSoundInterval = random(4000, 15000); // 8-10 sec
+  nextSoundInterval = random(4000, 15000); // 8 - 15 sec
 
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
   pinMode(ENA, OUTPUT);
+
+  pinMode(STARTUP, INPUT_PULLDOWN);
 
   pinMode(IN3, OUTPUT);
   pinMode(IN4, OUTPUT);
@@ -56,6 +58,13 @@ void setup() {
   digitalWrite(IN3, LOW);
   analogWrite(ENB, 0); // 0-255 (PWM)
 
+  while (digitalRead(STARTUP) != HIGH)
+  {
+   delay(1000);
+  }
+
+  speaker.setup();
+
 }
 
 void forward();
@@ -65,7 +74,16 @@ void spin();
 void rotateLeft();
 void rotateRight();
 
+void resetup() {
+  while(digitalRead(STARTUP) == LOW)
+    delay(1000);
+  speaker.player.playFolder(1, Speaker::STARTUP);
+  lastSoundTime = millis();
+}
+
 void loop() {
+  if(digitalRead(STARTUP) == LOW)
+    resetup();
   led.flash();
   if (Serial.available() > 0) {
     char command = Serial.read();
