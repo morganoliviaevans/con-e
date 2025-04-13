@@ -47,9 +47,9 @@ def get_limits(color):
 def get_direction(y1, y2):
     midpoint = (y1 + (y1 + y2)) / 2
 
-    if midpoint < 100:
+    if midpoint < 200:
         return Direction.ROTATE_LEFT
-    elif midpoint >= 500:
+    elif midpoint >= 400:
         return Direction.ROTATE_RIGHT
     else:
         return Direction.STOP
