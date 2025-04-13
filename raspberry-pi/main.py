@@ -1,6 +1,7 @@
 from PIL import Image
 from enum import Enum
 import numpy as np
+import random
 import cv2
 import serial
 import time
@@ -66,6 +67,9 @@ def loop(cam, arduino):
     lastSeen = time.time()
     lastSeenOrange = None
 
+    # Last time since random sound effect
+    lastSoundEffect = time.time() + random.randint(30, 60)
+
     while True:
         direction = Direction.STOP
         # OpenCV stuff
@@ -123,6 +127,12 @@ def loop(cam, arduino):
         # Check the state of the device
         match currentState:
             case DeviceState.PLAY_CAMERA:
+                # Send signal for random sound effect
+                if time.time() >= lastSoundEffect:
+                    arduino.write(b"m")
+                    print("sent random sound effect")
+                    lastSoundEffect = time.time() + random.randint(30, 60)
+
                 # do something based off the direction
                 match direction:
                     case Direction.FORWARD:
