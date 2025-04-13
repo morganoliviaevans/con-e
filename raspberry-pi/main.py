@@ -23,10 +23,10 @@ class Direction(Enum):
     BACKWARD = 5
 
 
-currentState = DeviceState.PLAY_CAMERA
+currentState = DeviceState.IDLE
 
 # TODO: fine tune the area threshold
-AREA_LOWER_THRESHOLD = 70000
+AREA_LOWER_THRESHOLD = 40000
 AREA_UPPER_THRESHOLD = 130000
 
 
@@ -48,9 +48,9 @@ def get_direction(y1, y2):
     midpoint = (y1 + (y1 + y2)) / 2
 
     if midpoint < 100:
-        return Direction.RIGHT
+        return Direction.ROTATE_RIGHT
     elif midpoint >= 500:
-        return Direction.LEFT
+        return Direction.ROTATE_LEFT
     else:
         return Direction.STOP
 
@@ -90,12 +90,14 @@ def loop(cam, arduino):
             bbox_area = area(x1, x2, y1, y2)
             print(bbox_area)
 
-            if bbox_area < AREA_LOWER_THRESHOLD:
+            orientation = get_direction(y1, y2)
+
+            if bbox_area < AREA_LOWER_THRESHOLD and orientation is Direction.STOP:
                 direction = Direction.FORWARD
-            elif bbox_area > AREA_UPPER_THRESHOLD:
+            elif bbox_area > AREA_UPPER_THRESHOLD and orientation is Direction.STOP:
                 direction = Direction.BACKWARD
             else:
-                direction = get_direction(y1, y2)
+                direction = orientation
 
             frame = cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
 
