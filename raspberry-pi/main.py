@@ -127,7 +127,6 @@ def loop(cam, arduino):
 
         # show cv frames
         cv2.imshow("frame", mask)
-        cv2.imshow("original", frame)
 
         # Check the state of the device
         match currentState:
