@@ -106,6 +106,7 @@ def loop(cam, arduino):
                 lastSeenOrange = time.time()
             elif time.time() - lastSeenOrange >= 5:
                 if currentState != DeviceState.PLAY_CAMERA:
+                    arduino.write(b"a")
                     print("going back to play_camera")
                     currentState = DeviceState.PLAY_CAMERA
         # if bbox is None
@@ -115,10 +116,12 @@ def loop(cam, arduino):
 
             if elapsed > 30:
                 if currentState != DeviceState.SLEEP:
+                    arduino.write(b"z")
                     print("sleeping")
                     currentState = DeviceState.SLEEP
             elif elapsed > 15:
                 if currentState != DeviceState.IDLE:
+                    arduino.write(b"i")
                     print("idling")
                     currentState = DeviceState.IDLE
 
