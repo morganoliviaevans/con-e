@@ -13,7 +13,8 @@ public:
   enum Voiceline {
     STARTUP = 1,
     HELLO1,
-    OKAY
+    OKAY,
+    SIREN
   };
   Speaker();
   void setup();                // Initializes the speaker
