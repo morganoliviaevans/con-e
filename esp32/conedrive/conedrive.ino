@@ -1,6 +1,7 @@
 #include "esp-speaker.h"
 #include "esp-led.h"
 
+
 // Objects and Rand Vars
 Led led; // RGB Led obj
 Speaker speaker;
@@ -23,15 +24,15 @@ bool isCenter = false;
 bool isLeft = false;
 bool isRight = false;
 
-
 void rotateLeft();
 //rotate 1 second
 
 void setup() {
   // Set pins as output
+  
+
   Serial.begin(9600);
-
-
+  delay(5000);
   led.setup();
 
   // seeding randomizer
@@ -126,10 +127,10 @@ void rotateLeft()
 
 digitalWrite(IN1,LOW);
 digitalWrite(IN2,HIGH);
-analogWrite(ENA, 180); // 0-255 (PWM)
+analogWrite(ENA, 160); // 0-255 (PWM)
 digitalWrite(IN3,LOW);
 digitalWrite(IN4,HIGH);
-analogWrite(ENB, 180); // 0-255 (PWM)
+analogWrite(ENB, 160); // 0-255 (PWM)
 }
 
 void forward()
@@ -159,10 +160,10 @@ void rotateRight()
 {
 digitalWrite(IN1,HIGH);
 digitalWrite(IN2,LOW);
-analogWrite(ENA, 180); // 0-255 (PWM)
+analogWrite(ENA, 160); // 0-255 (PWM)
 digitalWrite(IN3,HIGH);
 digitalWrite(IN4,LOW);
-analogWrite(ENB, 180); // 0-255 (PWM)
+analogWrite(ENB, 160); // 0-255 (PWM)
 }
 
 void stopMotor() {
