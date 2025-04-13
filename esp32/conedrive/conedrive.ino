@@ -8,11 +8,11 @@ Speaker speaker;
 unsigned long lastSoundTime = 0;
 unsigned long nextSoundInterval = 0;
 
-const int STARTUP = 5;
+const int STARTUP = 1;
 // Define motor control pins
-const int IN1 = 16;
-const int IN2 = 17;
-const int ENA = 18;
+const int IN1 = 4;
+const int IN2 = 5;
+const int ENA = 14;
 
 const int IN3 = 19;
 const int IN4 = 20;
