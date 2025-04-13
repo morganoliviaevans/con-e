@@ -14,7 +14,7 @@ void Speaker::setup()
   }
 
   player.volume(30);
-  playTrack(Speaker::STARTUP);
+  player.playFolder(1, Speaker::STARTUP);
   delay(4000);
 
   Serial.println(player.readFileCounts());

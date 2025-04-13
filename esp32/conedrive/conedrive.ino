@@ -37,7 +37,7 @@ void setup() {
   // seeding randomizer
   randomSeed(analogRead(A0));
   lastSoundTime = millis();
-  nextSoundInterval = random(8000, 20000); // 8-20 sec
+  nextSoundInterval = random(4000, 15000); // 8-10 sec
 
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
@@ -99,7 +99,7 @@ void loop() {
     speaker.playTrack((Speaker::Voiceline)randomTrack);
 
     lastSoundTime = now;
-    nextSoundInterval = random(8000, 20000);
+    nextSoundInterval = random(4000, 15000);
   }
 }
 
