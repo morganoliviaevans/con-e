@@ -6,6 +6,13 @@ import serial
 import time
 
 
+class DeviceState(Enum):
+    PLAY_CAMERA = 0
+    PLAY_REMOTE = 1
+    IDLE = 2
+    SLEEP = 3
+
+
 class Direction(Enum):
     STOP = 0
     ROTATE_LEFT = 1
@@ -13,6 +20,13 @@ class Direction(Enum):
     SPIN = 3
     FORWARD = 4
     BACKWARD = 5
+
+
+currentState = DeviceState.PLAY_CAMERA
+
+# TODO: fine tune the area threshold
+AREA_LOWER_THRESHOLD = 70000
+AREA_UPPER_THRESHOLD = 130000
 
 
 def get_limits(color):
@@ -45,12 +59,16 @@ def area(x1, x2, y1, y2):
 
 
 def loop(cam, arduino):
-    # TODO: fine tune the area threshold
-    AREA_LOWER_THRESHOLD = 70000
-    AREA_UPPER_THRESHOLD = 130000
+    global currentState
     orange = [12, 95, 247]
 
+    # Last State
+    lastSeen = time.time()
+    lastSeenOrange = None
+
     while True:
+        direction = Direction.STOP
+        # OpenCV stuff
         ret, frame = cam.read()
         cv2.normalize(frame, frame, 0, 255, cv2.NORM_MINMAX)
 
@@ -58,12 +76,11 @@ def loop(cam, arduino):
         lowerLimit, upperLimit = get_limits(orange)
 
         mask = cv2.inRange(hsvImage, lowerLimit, upperLimit)
-
         mask_ = Image.fromarray(mask)
-
         bbox = mask_.getbbox()
 
         if bbox is not None:
+            lastSeen = time.time()
             x1, y1, x2, y2 = bbox
 
             bbox_area = area(x1, x2, y1, y2)
@@ -78,26 +95,56 @@ def loop(cam, arduino):
 
             frame = cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
 
-            # do something based off the direction
-            match direction:
-                case Direction.FORWARD:
-                    arduino.write(b"f")
-                    print("forward")
-                case Direction.BACKWARD:
-                    arduino.write(b"b")
-                    print("backward")
-                case Direction.STOP:
-                    arduino.write(b"s")
-                    print("stop")
-                case Direction.ROTATE_LEFT:
-                    arduino.write(b"l")
-                    print("left")
-                case Direction.ROTATE_RIGHT:
-                    arduino.write(b"r")
-                    print("right")
+            # Go back to play state if orange for >= 5s
+            if lastSeenOrange is None:
+                lastSeenOrange = time.time()
+            elif time.time() - lastSeenOrange >= 5:
+                if currentState != DeviceState.PLAY_CAMERA:
+                    print("going back to play_camera")
+                    currentState = DeviceState.PLAY_CAMERA
+        # if bbox is None
+        else:
+            lastSeenOrange = None
+            elapsed = time.time() - lastSeen
 
+            if elapsed > 30:
+                if currentState != DeviceState.SLEEP:
+                    print("sleeping")
+                    currentState = DeviceState.SLEEP
+            elif elapsed > 15:
+                if currentState != DeviceState.IDLE:
+                    print("idling")
+                    currentState = DeviceState.IDLE
+
+        # show cv frames
         cv2.imshow("frame", mask)
         cv2.imshow("original", frame)
+
+        # Check the state of the device
+        match currentState:
+            case DeviceState.PLAY_CAMERA:
+                # do something based off the direction
+                match direction:
+                    case Direction.FORWARD:
+                        arduino.write(b"f")
+                        print("forward")
+                    case Direction.BACKWARD:
+                        arduino.write(b"b")
+                        print("backward")
+                    case Direction.STOP:
+                        arduino.write(b"s")
+                        print("stop")
+                    case Direction.ROTATE_LEFT:
+                        arduino.write(b"l")
+                        print("left")
+                    case Direction.ROTATE_RIGHT:
+                        arduino.write(b"r")
+                        print("right")
+            case DeviceState.IDLE:
+                arduino.write(b"s")
+                print("in idle state")
+            case DeviceState.SLEEP:
+                print("sleeping")
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
