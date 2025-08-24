@@ -70,14 +70,14 @@ ___
 <br>
 
 <div style="text-align: center;">
-  <img src="/media/david.jpg" alt="David" width="200"/><br/>
+  <img src="/media/david.jpg" alt="Erik David Piolo" width="200"/><br/>
   Erik David Piolo
 </div>
 <br>
 
 <div style="text-align: center;">
-  <img src="/media/morgan.jpg" alt="Erik David Piolo" width="200"/><br/>
-  Morgan Olivia Newton
+  <img src="/media/morgan.jpg" alt="Morgan Olivia Evans" width="200"/><br/>
+  Morgan Olivia Evans
 </div>
 <br>
 
